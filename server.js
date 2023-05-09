@@ -21,8 +21,11 @@ server.get('/', handelHome);
 server.get('/favorite', handelFavorite);
 server.get('/trending', handeltrending);
 server.get('/search', handelsearch);
-server.get('/getmovie', getMovieHandler);
+server.get('/getmovies', getMovieHandler);
 server.post('/addmovie', addMovieHandler);
+server.put('/update/:id', updateMoviesHandler);
+server.delete('/delete/:id', deleteMovieHandler);
+server.get('/getmovie/:id', getMoviebyId);
 server.get('/classic', handelOldMovies);
 server.get('/actor', handleByActor);
 server.get('*', handelNotFound);
@@ -123,11 +126,52 @@ function addMovieHandler(req, res) {
     client.query(sql, values)
         .then(data => {
             res.status(200).send("The data has been added successfully");
-        }).catch(error => {
+        }).catch((error) => {
             errorHandler(error, req, res)
         });
 }
 
+function updateMoviesHandler(req, res){
+    const {id} = req.params;
+    console.log(req.body);
+    const sql = `UPDATE movie SET title=$1, release_date=$2, poster_path=$3, overview=$4
+    WHERE id=${id};`
+    const {title, release_date,poster_path,overview} = req.body;
+    const values=[title, release_date, poster_path, overview];
+    client.query(sql,values)
+    .then((data)=>{
+        res.status(200).send(data)
+    })
+    .catch((error)=>{
+        errorHandler(error,req,res)
+    })
+
+}
+
+function deleteMovieHandler(req, res){
+    const {id} = req.params;
+    const sql = `DELETE FROM movie WHERE id=${id};`
+    client.query(sql)
+    .then((data)=>{
+        res.status(202).send(data)
+    
+    })
+    .catch((error) => {
+        errorHandler(error, req, res)
+    });
+}
+
+function getMoviebyId(req, res){
+    const {id} = req.params;
+    const sql = `SELECT * FROM movie WHERE id=${id};`
+    client.query(sql)
+    .then((data)=>{
+        res.status(200).send(data.rows)
+    })
+    .catch((error)=>{
+        errorHandler(error,req,res)
+    })
+}
 
 function handelHome(req, res) {
     let obj;
