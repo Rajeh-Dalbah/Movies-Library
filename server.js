@@ -3,7 +3,7 @@ let error404 = {
     "status": 404,
     "responseText": "Sorry, page not found "
 };
-let PORT = 3000
+let PORT = 3003
 const express = require('express');
 const cors = require('cors');
 const movieData = require('./Movie Data/data.json');
@@ -121,8 +121,8 @@ function getMovieHandler(req, res) {
 function addMovieHandler(req, res) {
     const movie = req.body;
     console.log(movie);
-    const sql = `INSERT INTO movie(title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4);`
-    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview];
+    const sql = `INSERT INTO movie(title,release_date,poster_path,overview, comment) VALUES ($1,$2,$3,$4,$5);`
+    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview, movie.comment];
     client.query(sql, values)
         .then(data => {
             res.status(200).send("The data has been added successfully");
@@ -134,10 +134,10 @@ function addMovieHandler(req, res) {
 function updateMoviesHandler(req, res){
     const {id} = req.params;
     console.log(req.body);
-    const sql = `UPDATE movie SET title=$1, release_date=$2, poster_path=$3, overview=$4
+    const sql = `UPDATE movie SET title=$1, release_date=$2, poster_path=$3, overview=$4, comment=$5
     WHERE id=${id};`
-    const {title, release_date,poster_path,overview} = req.body;
-    const values=[title, release_date, poster_path, overview];
+    const {title, release_date,poster_path,overview,comment} = req.body;
+    const values=[title, release_date, poster_path, overview,comment];
     client.query(sql,values)
     .then((data)=>{
         res.status(200).send(data)
@@ -200,7 +200,7 @@ function errorHandler(error, req, res) {
 client.connect()
     .then(() => {
         server.listen(PORT, () => {
-            console.log("listinig to port 3000");
+            console.log(`listinig to port ${PORT}`);
         })
 
 
